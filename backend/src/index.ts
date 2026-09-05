@@ -68,8 +68,17 @@ app.post("/api/v1/signup", authLimiter, async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     await UserModel.create({ username, password: hashedPassword });
     res.status(201).json({ message: "User signed up" });
-  } catch (e) {
-    res.status(409).json({ message: "User already exists" });
+  } catch (e: any) {
+    if (e?.code === 11000) {
+      // Duplicate key error — this username is genuinely taken.
+      res.status(409).json({ message: "User already exists" });
+      return;
+    }
+    // Anything else (DB connection hiccup, etc.) — log it so it's visible
+    // in the server logs, and tell the client the truth instead of
+    // guessing it was a duplicate username.
+    console.error("Signup error:", e);
+    res.status(500).json({ message: "Something went wrong. Please try again." });
   }
 });
 
