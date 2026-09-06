@@ -1,4 +1,4 @@
-import { BrainIcon, LinkIcon, TwitterIcon, YoutubeIcon } from "./Icons";
+import { BrainIcon, FileIcon, LinkIcon, TwitterIcon, YoutubeIcon } from "./Icons";
 import { ContentType } from "../lib/types";
 
 interface SidebarProps {
@@ -11,6 +11,7 @@ const ITEMS: { key: ContentType | "all"; label: string; icon: typeof BrainIcon }
   { key: "all", label: "All notes", icon: BrainIcon },
   { key: "youtube", label: "Videos", icon: YoutubeIcon },
   { key: "twitter", label: "Tweets", icon: TwitterIcon },
+  { key: "file", label: "Files", icon: FileIcon },
   { key: "other", label: "Links", icon: LinkIcon },
 ];
 

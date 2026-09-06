@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { ContentItem } from "../lib/types";
-import { CopyIcon, EditIcon, LinkIcon, PinIcon, TrashIcon, TwitterIcon, YoutubeIcon } from "./Icons";
+import {
+  CopyIcon,
+  EditIcon,
+  FileIcon,
+  LinkIcon,
+  PdfBadgeIcon,
+  PinIcon,
+  TrashIcon,
+  TwitterIcon,
+  YoutubeIcon,
+} from "./Icons";
 
 interface ContentCardProps {
   item: ContentItem;
@@ -14,8 +24,16 @@ function youtubeIdFromUrl(url: string): string | null {
   return match ? match[1] : null;
 }
 
+function formatFileSize(bytes?: number): string {
+  if (!bytes) return "";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export function ContentCard({ item, onDelete, onEdit, readOnly = false }: ContentCardProps) {
   const videoId = item.type === "youtube" ? youtubeIdFromUrl(item.link) : null;
+  const isPdf = item.type === "file" && item.fileMimeType === "application/pdf";
   const [copied, setCopied] = useState(false);
 
   function copyLink(e: React.MouseEvent) {
@@ -50,6 +68,20 @@ export function ContentCard({ item, onDelete, onEdit, readOnly = false }: Conten
         >
           <TwitterIcon className="w-9 h-9 text-[#1DA1F2]" />
         </a>
+      ) : item.type === "file" ? (
+        <a
+          href={item.link}
+          target="_blank"
+          rel="noreferrer"
+          download={isPdf ? undefined : item.fileName}
+          className={`flex items-center justify-center aspect-video ${isPdf ? "bg-red-50" : "bg-zinc-100"}`}
+        >
+          {isPdf ? (
+            <PdfBadgeIcon className="w-10 h-10 text-red-500" />
+          ) : (
+            <FileIcon className="w-9 h-9 text-zinc-400" />
+          )}
+        </a>
       ) : (
         <a
           href={item.link}
@@ -69,24 +101,29 @@ export function ContentCard({ item, onDelete, onEdit, readOnly = false }: Conten
               href={item.link}
               target="_blank"
               rel="noreferrer"
+              download={item.type === "file" && !isPdf ? item.fileName : undefined}
               className="block text-sm font-medium text-zinc-800 truncate hover:text-brand-600"
               title={item.title}
             >
               {item.title}
             </a>
-            <p className="text-xs text-zinc-400 truncate mt-0.5">{item.link}</p>
+            <p className="text-xs text-zinc-400 truncate mt-0.5">
+              {item.type === "file" ? formatFileSize(item.fileSize) : item.link}
+            </p>
           </div>
 
           {!readOnly && (
             <div className="shrink-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
-              <button
-                onClick={copyLink}
-                className="text-zinc-300 hover:text-brand-600 transition p-0.5"
-                aria-label="Copy link"
-                title={copied ? "Copied!" : "Copy link"}
-              >
-                <CopyIcon />
-              </button>
+              {item.type !== "file" && (
+                <button
+                  onClick={copyLink}
+                  className="text-zinc-300 hover:text-brand-600 transition p-0.5"
+                  aria-label="Copy link"
+                  title={copied ? "Copied!" : "Copy link"}
+                >
+                  <CopyIcon />
+                </button>
+              )}
               {onEdit && (
                 <button
                   onClick={() => onEdit(item)}

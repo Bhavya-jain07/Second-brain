@@ -1,24 +1,28 @@
-import { useState, DragEvent, FormEvent, ReactNode } from "react";
-import { UploadIcon, PlusIcon, ListIcon } from "./Icons";
+import { useRef, useState, ChangeEvent, DragEvent, FormEvent, ReactNode } from "react";
+import { UploadIcon, PlusIcon, ListIcon, PaperclipIcon } from "./Icons";
 
 interface DropZoneProps {
   onAddLink: (url: string) => Promise<void>;
+  onUploadFile: (file: File) => Promise<void>;
   onBulkAddClick?: () => void;
   children: ReactNode;
 }
 
+const MAX_FILE_SIZE = 8 * 1024 * 1024; // keep in sync with backend limit
+
 /**
- * Wraps the dashboard content. Drop a link anywhere inside (drag a tab, an
- * address-bar URL, or any text containing a link) and it gets added to the
- * brain. A small input at the top is a manual fallback for when dragging
- * isn't convenient (e.g. on a touchscreen).
+ * Wraps the dashboard content. Drop a link OR an actual file (PDF, image,
+ * doc — dragged from your computer) anywhere inside and it gets added to
+ * the brain. A small input/paperclip at the top are manual fallbacks for
+ * when dragging isn't convenient (e.g. on a touchscreen).
  */
-export function DropZone({ onAddLink, onBulkAddClick, children }: DropZoneProps) {
+export function DropZone({ onAddLink, onUploadFile, onBulkAddClick, children }: DropZoneProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [dragDepth, setDragDepth] = useState(0);
   const [manualLink, setManualLink] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function extractUrl(raw: string): string | null {
     const match = raw.match(/https?:\/\/[^\s]+/);
@@ -32,6 +36,22 @@ export function DropZone({ onAddLink, onBulkAddClick, children }: DropZoneProps)
       await onAddLink(url);
     } catch {
       // Parent already surfaces this as a toast — nothing more to do here.
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleFile(file: File) {
+    setError("");
+    if (file.size > MAX_FILE_SIZE) {
+      setError(`"${file.name}" is over 8MB — pick a smaller file.`);
+      return;
+    }
+    setBusy(true);
+    try {
+      await onUploadFile(file);
+    } catch {
+      // Parent already surfaces this as a toast.
     } finally {
       setBusy(false);
     }
@@ -61,12 +81,20 @@ export function DropZone({ onAddLink, onBulkAddClick, children }: DropZoneProps)
     setIsDragging(false);
     setDragDepth(0);
 
+    // Real files (dragged from the desktop/Finder/Explorer) take priority.
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      for (const file of Array.from(e.dataTransfer.files)) {
+        await handleFile(file);
+      }
+      return;
+    }
+
     const uriList = e.dataTransfer.getData("text/uri-list");
     const plainText = e.dataTransfer.getData("text/plain");
     const url = extractUrl(uriList) || extractUrl(plainText);
 
     if (!url) {
-      setError("Drop a link (YouTube video, tweet, or any URL).");
+      setError("Drop a link (YouTube video, tweet, or any URL) or a file.");
       return;
     }
     await handleLink(url);
@@ -78,6 +106,15 @@ export function DropZone({ onAddLink, onBulkAddClick, children }: DropZoneProps)
     if (!url) return;
     await handleLink(url);
     setManualLink("");
+  }
+
+  async function onFileInputChange(e: ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    for (const file of Array.from(files)) {
+      await handleFile(file);
+    }
+    e.target.value = ""; // allow re-selecting the same file later
   }
 
   return (
@@ -97,9 +134,18 @@ export function DropZone({ onAddLink, onBulkAddClick, children }: DropZoneProps)
           type="text"
           value={manualLink}
           onChange={(e) => setManualLink(e.target.value)}
-          placeholder="Drag a link anywhere here, or paste one and press add… (press / to focus)"
+          placeholder="Drag a link or file here, or paste a link… (press / to focus)"
           className="flex-1 bg-transparent outline-none text-sm placeholder:text-zinc-400"
         />
+        <input ref={fileInputRef} type="file" className="hidden" onChange={onFileInputChange} multiple />
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="flex items-center gap-1 text-sm font-medium text-zinc-500 hover:text-zinc-800 px-2 py-1.5 rounded-lg transition shrink-0"
+          title="Upload a file or PDF (max 8MB)"
+        >
+          <PaperclipIcon className="w-4 h-4" />
+        </button>
         {onBulkAddClick && (
           <button
             type="button"
@@ -128,7 +174,7 @@ export function DropZone({ onAddLink, onBulkAddClick, children }: DropZoneProps)
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-2xl bg-brand-50/80">
           <div className="flex flex-col items-center gap-2 text-brand-600">
             <UploadIcon className="w-8 h-8" />
-            <p className="font-medium">Drop to add to your brain</p>
+            <p className="font-medium">Drop a link or file to add it</p>
           </div>
         </div>
       )}

@@ -1,5 +1,5 @@
 import { ContentType } from "../lib/types";
-import { BrainIcon, LinkIcon, TwitterIcon, YoutubeIcon } from "./Icons";
+import { BrainIcon, FileIcon, LinkIcon, TwitterIcon, YoutubeIcon } from "./Icons";
 
 interface MobileTabBarProps {
   active: ContentType | "all";
@@ -10,6 +10,7 @@ const ITEMS: { key: ContentType | "all"; label: string; icon: typeof BrainIcon }
   { key: "all", label: "All", icon: BrainIcon },
   { key: "youtube", label: "Videos", icon: YoutubeIcon },
   { key: "twitter", label: "Tweets", icon: TwitterIcon },
+  { key: "file", label: "Files", icon: FileIcon },
   { key: "other", label: "Links", icon: LinkIcon },
 ];
 

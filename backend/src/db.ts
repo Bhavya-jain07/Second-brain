@@ -18,16 +18,20 @@ const UserSchema = new Schema({
 export const UserModel = model("User", UserSchema);
 
 // "youtube" and "twitter" are auto-detected from the pasted/dropped link.
+// "file" covers anything uploaded directly (PDFs, images, docs).
 // "other" is a generic fallback for any link that doesn't match a known pattern.
-export const CONTENT_TYPES = ["youtube", "twitter", "other"] as const;
+export const CONTENT_TYPES = ["youtube", "twitter", "file", "other"] as const;
 export type ContentType = (typeof CONTENT_TYPES)[number];
 
 const ContentSchema = new Schema(
   {
     title: { type: String, required: true },
-    link: { type: String, required: true },
+    link: { type: String, required: true }, // for files, this is a data: URI holding the file itself
     type: { type: String, enum: CONTENT_TYPES, required: true },
     thumbnail: { type: String }, // image URL, only set for youtube links
+    fileName: { type: String },
+    fileMimeType: { type: String },
+    fileSize: { type: Number },
     tags: { type: [String], default: [] }, // optional, added later by the user
     note: { type: String }, // optional short note, added later by the user
     pinned: { type: Boolean, default: false },

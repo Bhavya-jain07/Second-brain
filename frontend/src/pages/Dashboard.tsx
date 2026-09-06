@@ -84,6 +84,21 @@ export function Dashboard() {
     }
   }
 
+  async function handleUploadFile(file: File) {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await api.post("/content/upload", formData);
+
+      setContent((prev) => [res.data.content, ...prev]);
+      showToast("Saved!");
+    } catch (err) {
+      showToast(friendlyError(err), "error");
+      throw err;
+    }
+  }
+
   async function handleBulkAdd(urls: string[]) {
     let succeeded = 0;
     for (const url of urls) {
@@ -150,6 +165,7 @@ export function Dashboard() {
       all: content.length,
       youtube: content.filter((c) => c.type === "youtube").length,
       twitter: content.filter((c) => c.type === "twitter").length,
+      file: content.filter((c) => c.type === "file").length,
       other: content.filter((c) => c.type === "other").length,
     }),
     [content]
@@ -186,14 +202,14 @@ export function Dashboard() {
             </button>
           </div>
 
-          <DropZone onAddLink={handleAddLink} onBulkAddClick={() => setBulkAddOpen(true)}>
+          <DropZone onAddLink={handleAddLink} onUploadFile={handleUploadFile} onBulkAddClick={() => setBulkAddOpen(true)}>
             {loading ? (
               <SkeletonGrid />
             ) : filtered.length === 0 ? (
               <EmptyState
                 message={
                   content.length === 0
-                    ? "Nothing here yet — drag a link in, paste one above, or press / to jump right to it."
+                    ? "Nothing here yet — drag a link or file in, paste a link above, or press / to jump right to it."
                     : query
                     ? "No matches for your search."
                     : "Nothing in this category yet."

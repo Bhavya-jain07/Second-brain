@@ -111,6 +111,31 @@ export function ListIcon({ className = "w-4 h-4" }: IconProps) {
   );
 }
 
+export function FileIcon({ className = "w-5 h-5" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M14 3v5a1 1 0 0 0 1 1h5M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" />
+    </svg>
+  );
+}
+
+export function PdfBadgeIcon({ className = "w-5 h-5" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none">
+      <path d="M14 3v5a1 1 0 0 0 1 1h5M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <text x="12" y="17" textAnchor="middle" fontSize="6.5" fontWeight="700" fill="currentColor">PDF</text>
+    </svg>
+  );
+}
+
+export function PaperclipIcon({ className = "w-4 h-4" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21.4 11.05 12.5 20a4.95 4.95 0 0 1-7-7l9-8.95a3.5 3.5 0 0 1 5 5L10.5 18a2 2 0 0 1-3-3l7.6-7.55" />
+    </svg>
+  );
+}
+
 export function ShareIcon({ className = "w-4 h-4" }: IconProps) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">

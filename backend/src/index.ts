@@ -5,13 +5,19 @@ import jwt from "jsonwebtoken";
 import { z } from "zod";
 import mongoose from "mongoose";
 import rateLimit from "express-rate-limit";
+import multer from "multer";
 import { ContentModel, LinkModel, UserModel, CONTENT_TYPES } from "./db";
 import { JWT_SECRET, PORT, CLIENT_URL } from "./config";
 import { userMiddleware } from "./middleware";
 import { random } from "./utils";
 
 const app = express();
+
+// Render (and most hosts) sit behind a reverse proxy, so the app needs to
+// trust the X-Forwarded-For header to know the real client IP. Without
+// this, express-rate-limit throws on every request in production.
 app.set("trust proxy", 1);
+
 app.use(express.json());
 app.use(cors({ origin: CLIENT_URL }));
 
@@ -35,6 +41,15 @@ const contentSchema = z.object({
   type: z.enum(CONTENT_TYPES),
   title: z.string().min(1).max(200),
   thumbnail: z.string().url().optional(),
+});
+
+// Files are stored as base64 directly in MongoDB (no external storage
+// service needed) — kept well under Mongo's 16MB document limit once
+// base64-encoded (base64 adds ~33% size overhead).
+const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8MB
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: MAX_FILE_SIZE },
 });
 
 // All fields optional here — tags/note/pin are added later by editing a
@@ -181,6 +196,48 @@ app.post("/api/v1/content", userMiddleware, async (req, res) => {
   });
 
   res.status(201).json({ message: "Content added", content });
+});
+
+app.post("/api/v1/content/upload", userMiddleware, (req, res) => {
+  upload.single("file")(req, res, async (err) => {
+    if (err instanceof multer.MulterError) {
+      if (err.code === "LIMIT_FILE_SIZE") {
+        res.status(413).json({ message: "File is too large — max size is 8MB." });
+        return;
+      }
+      res.status(400).json({ message: "Upload failed: " + err.message });
+      return;
+    }
+    if (err) {
+      console.error("Upload error:", err);
+      res.status(500).json({ message: "Something went wrong uploading that file." });
+      return;
+    }
+
+    if (!req.file) {
+      res.status(400).json({ message: "No file was uploaded." });
+      return;
+    }
+
+    try {
+      const dataUri = `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`;
+
+      const content = await ContentModel.create({
+        title: req.file.originalname,
+        link: dataUri,
+        type: "file",
+        fileName: req.file.originalname,
+        fileMimeType: req.file.mimetype,
+        fileSize: req.file.size,
+        userId: req.userId,
+      });
+
+      res.status(201).json({ message: "File added", content });
+    } catch (e) {
+      console.error("File save error:", e);
+      res.status(500).json({ message: "Something went wrong saving that file." });
+    }
+  });
 });
 
 app.get("/api/v1/content", userMiddleware, async (req, res) => {

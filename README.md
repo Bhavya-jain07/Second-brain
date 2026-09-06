@@ -26,6 +26,9 @@ share view for your whole "brain".
 - Optional per-item extras (never required when you add something) — pin to
   top, free-text tags, and a short note, all editable via the pencil icon
   on a card
+- Upload files and PDFs directly — drag a file from your computer, or use
+  the paperclip button. Stored as base64 in MongoDB (max 8MB per file, no
+  external storage service needed)
 - Bulk add — paste several links at once (one per line)
 - Search also matches tags, not just title/link
 - Mobile view: sidebar becomes a bottom tab bar on small screens
