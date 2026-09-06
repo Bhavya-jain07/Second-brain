@@ -135,7 +135,7 @@ export function DropZone({ onAddLink, onUploadFile, onBulkAddClick, children }: 
           value={manualLink}
           onChange={(e) => setManualLink(e.target.value)}
           placeholder="Drag a link or file here, or paste a link… (press / to focus)"
-          className="flex-1 bg-transparent outline-none text-sm placeholder:text-zinc-400"
+          className="flex-1 min-w-0 bg-transparent outline-none text-sm placeholder:text-zinc-400"
         />
         <input ref={fileInputRef} type="file" className="hidden" onChange={onFileInputChange} multiple />
         <button

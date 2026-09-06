@@ -189,7 +189,7 @@ export function Dashboard() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search titles, links, or tags…"
-                className="flex-1 text-sm outline-none bg-transparent placeholder:text-zinc-400"
+                className="flex-1 min-w-0 text-sm outline-none bg-transparent placeholder:text-zinc-400"
               />
             </div>
             <button
