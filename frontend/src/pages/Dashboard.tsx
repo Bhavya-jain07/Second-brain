@@ -174,30 +174,37 @@ export function Dashboard() {
   if (!token) return <Navigate to="/signin" replace />;
 
   return (
-    <div className="min-h-screen bg-white pb-16 sm:pb-0">
+    <div className="min-h-screen bg-swiss-bg text-swiss-ink pb-16 sm:pb-0">
       <Navbar username={username} onShareClick={() => setShareOpen(true)} />
 
-      <div className="flex gap-6 max-w-6xl mx-auto px-6 py-6">
+      <div className="flex gap-6 max-w-6xl mx-auto px-6 md:px-10 py-7">
         <Sidebar active={filter} onChange={setFilter} counts={counts} />
 
         <main className="flex-1 min-w-0">
+          <div className="flex items-baseline justify-between mb-6 pb-4 border-b-[3px] border-swiss-ink">
+            <h1 className="text-4xl font-extrabold tracking-tight">Your Brain</h1>
+            <span className="text-xs font-bold uppercase tracking-wide text-swiss-muted">
+              {content.length} saved item{content.length === 1 ? "" : "s"}
+            </span>
+          </div>
+
           {/* Search + sort bar */}
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex-1 flex items-center gap-2 border border-zinc-200 rounded-lg px-3 py-2">
-              <SearchIcon className="w-4 h-4 text-zinc-400 shrink-0" />
+          <div className="grid grid-cols-[1fr_auto] border-2 border-swiss-ink mb-6">
+            <div className="flex items-center gap-2.5 px-4 py-3 border-r-2 border-swiss-ink">
+              <SearchIcon className="w-4 h-4 text-swiss-muted shrink-0" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search titles, links, or tags…"
-                className="flex-1 min-w-0 text-sm outline-none bg-transparent placeholder:text-zinc-400"
+                className="flex-1 min-w-0 text-sm outline-none bg-transparent placeholder:text-swiss-faint"
               />
             </div>
             <button
               onClick={() => setSortOrder((s) => (s === "newest" ? "oldest" : "newest"))}
-              className="flex items-center gap-1.5 text-sm text-zinc-600 border border-zinc-200 rounded-lg px-3 py-2 hover:bg-zinc-50 transition shrink-0"
+              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-5 hover:bg-swiss-ink hover:text-white transition shrink-0"
               title="Toggle sort order"
             >
-              <SortIcon className="w-4 h-4" />
+              <SortIcon className="w-3.5 h-3.5" />
               {sortOrder === "newest" ? "Newest" : "Oldest"}
             </button>
           </div>
@@ -216,9 +223,9 @@ export function Dashboard() {
                 }
               />
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filtered.map((item) => (
-                  <ContentCard key={item._id} item={item} onDelete={handleDelete} onEdit={setEditingItem} />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 border-t-2 border-l-2 border-swiss-ink">
+                {filtered.map((item, i) => (
+                  <ContentCard key={item._id} item={item} index={i} onDelete={handleDelete} onEdit={setEditingItem} />
                 ))}
               </div>
             )}

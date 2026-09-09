@@ -7,6 +7,22 @@ share view for your whole "brain".
 - **Backend**: Node.js, Express, TypeScript, MongoDB (Mongoose), JWT auth, bcrypt, Zod validation
 - **Frontend**: React, TypeScript, Vite, Tailwind CSS, React Router
 
+## Design
+
+Two deliberately different visual languages, split by purpose:
+
+- **Signup / Signin / Forgot-password** — a hand-generated pixel-art sunset
+  scene (`frontend/public/auth-bg.png`, made procedurally with Python/Pillow)
+  behind a retro glass panel, "Press Start 2P" + "VT323" fonts, a
+  password show/hide toggle, and Google/GitHub buttons. The OAuth buttons
+  are UI-only for now — clicking shows a toast, since real OAuth needs a
+  backend integration (Google Cloud credentials, Passport.js or similar)
+  that hasn't been wired up yet.
+- **Dashboard / shared-brain view** — a Swiss / International Typographic
+  Style layout: bold black grid lines, one red accent color, numbered
+  cards, no gradients or shadows, cards invert to black on hover. Colors
+  live in `frontend/tailwind.config.js` under the `swiss` token group.
+
 ## Features
 
 - Signup / signin with hashed passwords (bcrypt) and JWT sessions

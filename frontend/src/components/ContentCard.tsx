@@ -14,10 +14,18 @@ import {
 
 interface ContentCardProps {
   item: ContentItem;
+  index?: number;
   onDelete?: (id: string) => void;
   onEdit?: (item: ContentItem) => void;
   readOnly?: boolean;
 }
+
+const TYPE_LABEL: Record<ContentItem["type"], string> = {
+  youtube: "VIDEO",
+  twitter: "TWEET",
+  file: "FILE",
+  other: "LINK",
+};
 
 function youtubeIdFromUrl(url: string): string | null {
   const match = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{6,})/);
@@ -31,7 +39,7 @@ function formatFileSize(bytes?: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export function ContentCard({ item, onDelete, onEdit, readOnly = false }: ContentCardProps) {
+export function ContentCard({ item, index, onDelete, onEdit, readOnly = false }: ContentCardProps) {
   const videoId = item.type === "youtube" ? youtubeIdFromUrl(item.link) : null;
   const isPdf = item.type === "file" && item.fileMimeType === "application/pdf";
   const [copied, setCopied] = useState(false);
@@ -43,30 +51,29 @@ export function ContentCard({ item, onDelete, onEdit, readOnly = false }: Conten
     setTimeout(() => setCopied(false), 1200);
   }
 
+  const indexLabel = typeof index === "number" ? String(index + 1).padStart(2, "0") : null;
+
   return (
-    <div className="group relative rounded-xl border border-zinc-200 bg-white overflow-hidden hover:shadow-md hover:border-zinc-300 transition-shadow">
+    <div className="group relative bg-white border-r-2 border-b-2 border-swiss-ink hover:bg-swiss-ink transition-colors">
       {item.pinned && (
-        <span className="absolute top-2 left-2 z-10 bg-white/90 backdrop-blur rounded-full p-1 shadow-sm text-brand-600">
-          <PinIcon filled className="w-3.5 h-3.5" />
+        <span className="absolute top-2.5 left-2.5 z-10 bg-swiss-accent text-white text-[10px] font-extrabold px-1.5 py-0.5 tracking-wide">
+          PINNED
         </span>
       )}
 
       {/* Thumbnail area */}
       {item.type === "youtube" && videoId ? (
-        <a href={item.link} target="_blank" rel="noreferrer" className="block relative aspect-video bg-zinc-100">
+        <a href={item.link} target="_blank" rel="noreferrer" className="block relative aspect-video bg-swiss-panel border-b-2 border-swiss-ink group-hover:border-white/20">
           <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover" />
-          <span className="absolute bottom-2 right-2 bg-black/70 rounded-full p-1.5">
-            <YoutubeIcon className="w-3.5 h-3.5 text-white" />
-          </span>
         </a>
       ) : item.type === "twitter" ? (
         <a
           href={item.link}
           target="_blank"
           rel="noreferrer"
-          className="flex items-center justify-center aspect-video bg-[#1DA1F2]/10"
+          className="flex items-center justify-center aspect-video bg-swiss-panel border-b-2 border-swiss-ink group-hover:border-white/20 group-hover:bg-[#1c1b18] text-swiss-ink group-hover:text-white transition-colors"
         >
-          <TwitterIcon className="w-9 h-9 text-[#1DA1F2]" />
+          <TwitterIcon className="w-8 h-8" />
         </a>
       ) : item.type === "file" ? (
         <a
@@ -74,50 +81,51 @@ export function ContentCard({ item, onDelete, onEdit, readOnly = false }: Conten
           target="_blank"
           rel="noreferrer"
           download={isPdf ? undefined : item.fileName}
-          className={`flex items-center justify-center aspect-video ${isPdf ? "bg-red-50" : "bg-zinc-100"}`}
+          className="flex items-center justify-center aspect-video bg-swiss-panel border-b-2 border-swiss-ink group-hover:border-white/20 group-hover:bg-[#1c1b18] text-swiss-ink group-hover:text-white transition-colors"
         >
-          {isPdf ? (
-            <PdfBadgeIcon className="w-10 h-10 text-red-500" />
-          ) : (
-            <FileIcon className="w-9 h-9 text-zinc-400" />
-          )}
+          {isPdf ? <PdfBadgeIcon className="w-9 h-9" /> : <FileIcon className="w-8 h-8" />}
         </a>
       ) : (
         <a
           href={item.link}
           target="_blank"
           rel="noreferrer"
-          className="flex items-center justify-center aspect-video bg-zinc-100"
+          className="flex items-center justify-center aspect-video bg-swiss-panel border-b-2 border-swiss-ink group-hover:border-white/20 group-hover:bg-[#1c1b18] text-swiss-ink group-hover:text-white transition-colors"
         >
-          <LinkIcon className="w-9 h-9 text-zinc-400" />
+          <LinkIcon className="w-8 h-8" />
         </a>
       )}
 
       {/* Body */}
-      <div className="p-3">
+      <div className="p-3.5">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
+            {indexLabel && (
+              <p className="text-[10px] font-bold text-swiss-faint group-hover:text-white/40 mb-1 tracking-wide">
+                {indexLabel} — {TYPE_LABEL[item.type]}
+              </p>
+            )}
             <a
               href={item.link}
               target="_blank"
               rel="noreferrer"
               download={item.type === "file" && !isPdf ? item.fileName : undefined}
-              className="block text-sm font-medium text-zinc-800 truncate hover:text-brand-600"
+              className="block text-sm font-semibold text-swiss-ink group-hover:text-white truncate"
               title={item.title}
             >
               {item.title}
             </a>
-            <p className="text-xs text-zinc-400 truncate mt-0.5">
+            <p className="text-xs text-swiss-muted group-hover:text-white/50 truncate mt-0.5 font-mono">
               {item.type === "file" ? formatFileSize(item.fileSize) : item.link}
             </p>
           </div>
 
           {!readOnly && (
-            <div className="shrink-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
+            <div className="shrink-0 flex items-center gap-0.5">
               {item.type !== "file" && (
                 <button
                   onClick={copyLink}
-                  className="text-zinc-300 hover:text-brand-600 transition p-0.5"
+                  className="text-swiss-faint hover:text-swiss-accent group-hover:text-white/50 group-hover:hover:text-swiss-accent transition p-0.5"
                   aria-label="Copy link"
                   title={copied ? "Copied!" : "Copy link"}
                 >
@@ -127,7 +135,7 @@ export function ContentCard({ item, onDelete, onEdit, readOnly = false }: Conten
               {onEdit && (
                 <button
                   onClick={() => onEdit(item)}
-                  className="text-zinc-300 hover:text-brand-600 transition p-0.5"
+                  className="text-swiss-faint hover:text-swiss-accent group-hover:text-white/50 group-hover:hover:text-swiss-accent transition p-0.5"
                   aria-label="Edit"
                   title="Add tags, note, or pin"
                 >
@@ -137,7 +145,7 @@ export function ContentCard({ item, onDelete, onEdit, readOnly = false }: Conten
               {onDelete && (
                 <button
                   onClick={() => onDelete(item._id)}
-                  className="text-zinc-300 hover:text-red-500 transition p-0.5"
+                  className="text-swiss-faint hover:text-swiss-accent group-hover:text-white/50 group-hover:hover:text-swiss-accent transition p-0.5"
                   aria-label="Delete"
                 >
                   <TrashIcon />
@@ -147,12 +155,15 @@ export function ContentCard({ item, onDelete, onEdit, readOnly = false }: Conten
           )}
         </div>
 
-        {item.note && <p className="text-xs text-zinc-500 mt-2 line-clamp-2">{item.note}</p>}
+        {item.note && <p className="text-xs text-swiss-muted group-hover:text-white/60 mt-2 line-clamp-2">{item.note}</p>}
 
         {item.tags && item.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-2">
+          <div className="flex flex-wrap gap-1.5 mt-2.5">
             {item.tags.map((tag) => (
-              <span key={tag} className="text-[10px] font-medium bg-zinc-100 text-zinc-500 px-1.5 py-0.5 rounded">
+              <span
+                key={tag}
+                className="text-[10px] font-bold uppercase tracking-wide border border-swiss-ink group-hover:border-white/30 text-swiss-ink group-hover:text-white/70 px-1.5 py-0.5"
+              >
                 {tag}
               </span>
             ))}

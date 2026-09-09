@@ -16,9 +16,22 @@ export default {
           800: "#4c1bb0",
           900: "#3f1a8c",
         },
+        // Swiss / International Typographic Style tokens — used for the
+        // dashboard (bold grid, minimal color, no gradients/shadows).
+        swiss: {
+          bg: "#f5f4f0",
+          ink: "#111111",
+          accent: "#e8391c",
+          muted: "#6b6a66",
+          faint: "#a19f96",
+          line: "#d8d6ce",
+          panel: "#f0efe9",
+        },
       },
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        pixel: ['"Press Start 2P"', "monospace"],
+        retro: ["VT323", "monospace"],
       },
       keyframes: {
         fadeIn: {

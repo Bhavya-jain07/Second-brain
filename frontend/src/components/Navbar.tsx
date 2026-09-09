@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { BrainIcon, ShareIcon } from "./Icons";
+import { ShareIcon } from "./Icons";
 
 interface NavbarProps {
   username?: string;
@@ -16,31 +16,41 @@ export function Navbar({ username, onShareClick }: NavbarProps) {
   }
 
   return (
-    <header className="flex items-center justify-between px-6 py-4 border-b border-zinc-100">
-      <div className="flex items-center gap-2 text-zinc-800 font-semibold">
-        <BrainIcon className="w-6 h-6 text-brand-600" />
-        Second Brain
+    <div className="border-b-[3px] border-swiss-ink px-6 md:px-10 pt-5 relative overflow-hidden">
+      <div
+        aria-hidden
+        className="absolute right-6 -top-8 text-[110px] md:text-[150px] font-extrabold leading-none pointer-events-none select-none text-transparent"
+        style={{ WebkitTextStroke: "2px rgba(17,17,17,0.08)" }}
+      >
+        02
       </div>
 
-      <div className="flex items-center gap-3">
-        {username && <span className="hidden sm:block text-sm text-zinc-500">Hi, {username}</span>}
-        {onShareClick && (
-          <button
-            onClick={onShareClick}
-            className="flex items-center gap-1.5 text-sm font-medium bg-brand-600 text-white px-3.5 py-2 rounded-lg hover:bg-brand-700 transition"
-          >
-            <ShareIcon /> Share Brain
-          </button>
-        )}
-        {username && (
-          <button
-            onClick={logout}
-            className="text-sm font-medium text-zinc-500 hover:text-zinc-800 px-3 py-2 transition"
-          >
-            Logout
-          </button>
-        )}
+      <div className="relative z-[1] flex items-center justify-between pb-5">
+        <div className="font-extrabold text-lg tracking-tight">
+          SECOND<span className="text-swiss-accent">.</span>BRAIN
+        </div>
+
+        <div className="flex items-center gap-5">
+          {username && <span className="hidden sm:block text-sm">hi, {username}</span>}
+          {onShareClick && (
+            <button
+              onClick={onShareClick}
+              className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide bg-swiss-ink text-swiss-bg px-4 py-2.5 hover:bg-swiss-accent transition"
+            >
+              <ShareIcon className="w-3.5 h-3.5" />
+              Share Brain
+            </button>
+          )}
+          {username && (
+            <button
+              onClick={logout}
+              className="text-xs font-bold uppercase tracking-wide text-swiss-muted hover:text-swiss-accent transition"
+            >
+              Logout
+            </button>
+          )}
+        </div>
       </div>
-    </header>
+    </div>
   );
 }

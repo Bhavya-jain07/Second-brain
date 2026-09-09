@@ -1,4 +1,3 @@
-import { BrainIcon, FileIcon, LinkIcon, TwitterIcon, YoutubeIcon } from "./Icons";
 import { ContentType } from "../lib/types";
 
 interface SidebarProps {
@@ -7,33 +6,38 @@ interface SidebarProps {
   counts: Record<ContentType | "all", number>;
 }
 
-const ITEMS: { key: ContentType | "all"; label: string; icon: typeof BrainIcon }[] = [
-  { key: "all", label: "All notes", icon: BrainIcon },
-  { key: "youtube", label: "Videos", icon: YoutubeIcon },
-  { key: "twitter", label: "Tweets", icon: TwitterIcon },
-  { key: "file", label: "Files", icon: FileIcon },
-  { key: "other", label: "Links", icon: LinkIcon },
+const ITEMS: { key: ContentType | "all"; label: string; idx: string }[] = [
+  { key: "all", label: "All notes", idx: "01" },
+  { key: "youtube", label: "Videos", idx: "02" },
+  { key: "twitter", label: "Tweets", idx: "03" },
+  { key: "file", label: "Files", idx: "04" },
+  { key: "other", label: "Links", idx: "05" },
 ];
 
 export function Sidebar({ active, onChange, counts }: SidebarProps) {
   return (
-    <aside className="w-56 shrink-0 border-r border-zinc-100 pr-4 hidden sm:block">
-      <nav className="space-y-1">
-        {ITEMS.map(({ key, label, icon: Icon }) => {
+    <aside className="w-52 shrink-0 border-r-[3px] border-swiss-ink pr-5 hidden sm:block">
+      <p className="text-[11px] font-bold uppercase tracking-widest text-swiss-muted mb-4">Filter</p>
+      <nav>
+        {ITEMS.map(({ key, label, idx }) => {
           const isActive = active === key;
           return (
             <button
               key={key}
               onClick={() => onChange(key)}
-              className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm font-medium transition ${
-                isActive ? "bg-brand-50 text-brand-700" : "text-zinc-600 hover:bg-zinc-50"
+              className={`w-full flex items-baseline justify-between py-2.5 border-b border-swiss-line text-sm transition ${
+                isActive ? "font-bold text-swiss-ink" : "text-swiss-muted hover:text-swiss-ink"
               }`}
             >
-              <span className="flex items-center gap-2">
-                <Icon className="w-4 h-4" />
+              <span>
+                <span className={`text-[11px] mr-2 font-bold ${isActive ? "text-swiss-accent" : "text-swiss-faint"}`}>
+                  {idx}
+                </span>
                 {label}
               </span>
-              <span className={`text-xs ${isActive ? "text-brand-500" : "text-zinc-400"}`}>{counts[key]}</span>
+              <span className={`text-[11px] ${isActive ? "text-swiss-accent" : "text-swiss-faint"}`}>
+                {counts[key]}
+              </span>
             </button>
           );
         })}

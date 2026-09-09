@@ -123,25 +123,25 @@ export function DropZone({ onAddLink, onUploadFile, onBulkAddClick, children }: 
       onDragLeave={onDragLeave}
       onDragOver={onDragOver}
       onDrop={onDrop}
-      className={`relative rounded-2xl border-2 border-dashed transition-colors ${
-        isDragging ? "drop-active" : "border-zinc-200"
+      className={`relative border-2 border-dashed transition-colors ${
+        isDragging ? "border-swiss-ink bg-swiss-panel" : "border-swiss-faint"
       }`}
     >
-      <form onSubmit={onManualSubmit} className="flex items-center gap-2 p-4 border-b border-zinc-100">
-        <UploadIcon className="w-5 h-5 text-zinc-400 shrink-0" />
+      <form onSubmit={onManualSubmit} className="flex items-center gap-2 p-4 border-b-2 border-swiss-ink">
+        <UploadIcon className="w-5 h-5 text-swiss-muted shrink-0" />
         <input
           id="sb-quick-add-input"
           type="text"
           value={manualLink}
           onChange={(e) => setManualLink(e.target.value)}
           placeholder="Drag a link or file here, or paste a link… (press / to focus)"
-          className="flex-1 min-w-0 bg-transparent outline-none text-sm placeholder:text-zinc-400"
+          className="flex-1 min-w-0 bg-transparent outline-none text-sm placeholder:text-swiss-faint"
         />
         <input ref={fileInputRef} type="file" className="hidden" onChange={onFileInputChange} multiple />
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="flex items-center gap-1 text-sm font-medium text-zinc-500 hover:text-zinc-800 px-2 py-1.5 rounded-lg transition shrink-0"
+          className="flex items-center gap-1 text-swiss-muted hover:text-swiss-accent px-2 py-1.5 transition shrink-0"
           title="Upload a file or PDF (max 8MB)"
         >
           <PaperclipIcon className="w-4 h-4" />
@@ -150,7 +150,7 @@ export function DropZone({ onAddLink, onUploadFile, onBulkAddClick, children }: 
           <button
             type="button"
             onClick={onBulkAddClick}
-            className="flex items-center gap-1 text-sm font-medium text-zinc-500 hover:text-zinc-800 px-2 py-1.5 rounded-lg transition shrink-0"
+            className="flex items-center gap-1 text-swiss-muted hover:text-swiss-accent px-2 py-1.5 transition shrink-0"
             title="Add multiple links at once"
           >
             <ListIcon className="w-4 h-4" />
@@ -159,22 +159,22 @@ export function DropZone({ onAddLink, onUploadFile, onBulkAddClick, children }: 
         <button
           type="submit"
           disabled={busy || !manualLink.trim()}
-          className="flex items-center gap-1 text-sm font-medium bg-brand-600 text-white px-3 py-1.5 rounded-lg hover:bg-brand-700 disabled:opacity-40 transition shrink-0"
+          className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide bg-swiss-ink text-swiss-bg px-4 py-2 hover:bg-swiss-accent disabled:opacity-40 transition shrink-0"
         >
-          <PlusIcon className="w-3.5 h-3.5" /> Add
+          <PlusIcon className="w-3 h-3" /> Add
         </button>
       </form>
 
-      {error && <p className="px-4 pt-3 text-sm text-red-500">{error}</p>}
-      {busy && <p className="px-4 pt-3 text-sm text-zinc-400">Adding…</p>}
+      {error && <p className="px-4 pt-3 text-sm text-swiss-accent">{error}</p>}
+      {busy && <p className="px-4 pt-3 text-sm text-swiss-muted">Adding…</p>}
 
       <div className="p-4">{children}</div>
 
       {isDragging && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-2xl bg-brand-50/80">
-          <div className="flex flex-col items-center gap-2 text-brand-600">
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-swiss-bg/90">
+          <div className="flex flex-col items-center gap-2 text-swiss-ink">
             <UploadIcon className="w-8 h-8" />
-            <p className="font-medium">Drop a link or file to add it</p>
+            <p className="font-bold uppercase text-sm tracking-wide">Drop a link or file to add it</p>
           </div>
         </div>
       )}

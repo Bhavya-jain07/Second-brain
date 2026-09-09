@@ -4,7 +4,6 @@ import axios from "axios";
 import { BACKEND_URL } from "../lib/api";
 import { ContentItem } from "../lib/types";
 import { ContentCard } from "../components/ContentCard";
-import { BrainIcon } from "../components/Icons";
 
 export function SharedBrain() {
   const { shareLink } = useParams();
@@ -25,33 +24,41 @@ export function SharedBrain() {
   }, [shareLink]);
 
   if (status === "loading") {
-    return <div className="min-h-screen flex items-center justify-center text-zinc-400 text-sm">Loading brain…</div>;
+    return (
+      <div className="min-h-screen bg-swiss-bg flex items-center justify-center text-swiss-muted text-sm">
+        Loading brain…
+      </div>
+    );
   }
 
   if (status === "not-found") {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-2 text-center px-4">
-        <BrainIcon className="w-8 h-8 text-zinc-300" />
-        <p className="text-zinc-600 font-medium">This share link doesn't exist</p>
-        <p className="text-sm text-zinc-400">It may have been removed by its owner.</p>
+      <div className="min-h-screen bg-swiss-bg flex flex-col items-center justify-center gap-2 text-center px-4">
+        <p className="text-5xl font-extrabold text-swiss-faint">∅</p>
+        <p className="text-swiss-ink font-bold">This share link doesn't exist</p>
+        <p className="text-sm text-swiss-muted">It may have been removed by its owner.</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="flex items-center gap-2 px-6 py-4 border-b border-zinc-100">
-        <BrainIcon className="w-6 h-6 text-brand-600" />
-        <span className="font-semibold text-zinc-800">{username}'s Second Brain</span>
+    <div className="min-h-screen bg-swiss-bg text-swiss-ink">
+      <header className="flex items-center justify-between px-6 md:px-10 py-6 border-b-[3px] border-swiss-ink">
+        <span className="font-extrabold text-lg tracking-tight">
+          {username}'s SECOND<span className="text-swiss-accent">.</span>BRAIN
+        </span>
+        <span className="text-xs font-bold uppercase tracking-wide text-swiss-muted">Read-only</span>
       </header>
 
-      <main className="max-w-5xl mx-auto px-6 py-6">
+      <main className="max-w-5xl mx-auto px-6 md:px-10 py-8">
         {content.length === 0 ? (
-          <p className="text-sm text-zinc-400 text-center py-16">This brain is empty for now.</p>
+          <p className="text-sm text-swiss-muted text-center py-16 border-2 border-dashed border-swiss-faint">
+            This brain is empty for now.
+          </p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {content.map((item) => (
-              <ContentCard key={item._id} item={item} readOnly />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 border-t-2 border-l-2 border-swiss-ink">
+            {content.map((item, i) => (
+              <ContentCard key={item._id} item={item} index={i} readOnly />
             ))}
           </div>
         )}

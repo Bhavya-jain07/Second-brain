@@ -31,16 +31,16 @@ export function EditContentModal({ item, onClose, onSave }: EditContentModalProp
   }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-swiss-ink/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-white border-2 border-swiss-ink w-full max-w-sm p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-zinc-800">Edit details</h2>
-          <button onClick={onClose} className="text-zinc-400 hover:text-zinc-600">
+          <h2 className="font-extrabold text-swiss-ink uppercase text-sm tracking-wide">Edit details</h2>
+          <button onClick={onClose} className="text-swiss-faint hover:text-swiss-ink">
             <CloseIcon />
           </button>
         </div>
 
-        <p className="text-xs text-zinc-500 mb-4 truncate" title={item.title}>
+        <p className="text-xs text-swiss-muted mb-4 truncate font-mono" title={item.title}>
           {item.title}
         </p>
 
@@ -48,8 +48,8 @@ export function EditContentModal({ item, onClose, onSave }: EditContentModalProp
           <button
             type="button"
             onClick={() => setPinned((p) => !p)}
-            className={`w-full flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-lg border transition ${
-              pinned ? "bg-brand-50 border-brand-200 text-brand-700" : "border-zinc-200 text-zinc-600 hover:bg-zinc-50"
+            className={`w-full flex items-center gap-2 text-sm font-bold uppercase tracking-wide px-3 py-2.5 border-2 transition ${
+              pinned ? "bg-swiss-ink border-swiss-ink text-white" : "border-swiss-ink text-swiss-ink hover:bg-swiss-panel"
             }`}
           >
             <PinIcon filled={pinned} className="w-4 h-4" />
@@ -57,24 +57,24 @@ export function EditContentModal({ item, onClose, onSave }: EditContentModalProp
           </button>
 
           <div>
-            <label className="text-sm font-medium text-zinc-700">Tags (optional)</label>
+            <label className="text-xs font-bold uppercase tracking-wide text-swiss-muted">Tags (optional)</label>
             <input
               value={tagsInput}
               onChange={(e) => setTagsInput(e.target.value)}
               placeholder="e.g. interview, backend"
-              className="mt-1 w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-500"
+              className="mt-1.5 w-full border-2 border-swiss-ink px-3 py-2 text-sm outline-none focus:border-swiss-accent"
             />
-            <p className="text-xs text-zinc-400 mt-1">Comma-separated, up to 10.</p>
+            <p className="text-xs text-swiss-faint mt-1">Comma-separated, up to 10.</p>
           </div>
 
           <div>
-            <label className="text-sm font-medium text-zinc-700">Note (optional)</label>
+            <label className="text-xs font-bold uppercase tracking-wide text-swiss-muted">Note (optional)</label>
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="Why did you save this?"
               rows={3}
-              className="mt-1 w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm outline-none focus:border-brand-500 resize-none"
+              className="mt-1.5 w-full border-2 border-swiss-ink px-3 py-2 text-sm outline-none focus:border-swiss-accent resize-none"
               maxLength={300}
             />
           </div>
@@ -82,7 +82,7 @@ export function EditContentModal({ item, onClose, onSave }: EditContentModalProp
           <button
             type="submit"
             disabled={saving}
-            className="w-full bg-brand-600 text-white text-sm font-medium py-2.5 rounded-lg hover:bg-brand-700 disabled:opacity-50 transition"
+            className="w-full bg-swiss-ink text-white text-xs font-bold uppercase tracking-wide py-3 hover:bg-swiss-accent disabled:opacity-50 transition"
           >
             {saving ? "Saving…" : "Save"}
           </button>

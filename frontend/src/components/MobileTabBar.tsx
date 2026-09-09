@@ -16,15 +16,15 @@ const ITEMS: { key: ContentType | "all"; label: string; icon: typeof BrainIcon }
 
 export function MobileTabBar({ active, onChange }: MobileTabBarProps) {
   return (
-    <nav className="sm:hidden fixed bottom-0 inset-x-0 bg-white border-t border-zinc-100 flex items-stretch z-40">
+    <nav className="sm:hidden fixed bottom-0 inset-x-0 bg-swiss-bg border-t-[3px] border-swiss-ink flex items-stretch z-40">
       {ITEMS.map(({ key, label, icon: Icon }) => {
         const isActive = active === key;
         return (
           <button
             key={key}
             onClick={() => onChange(key)}
-            className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 text-[11px] font-medium transition ${
-              isActive ? "text-brand-600" : "text-zinc-400"
+            className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 text-[10px] font-bold uppercase tracking-wide transition ${
+              isActive ? "text-swiss-accent" : "text-swiss-faint"
             }`}
           >
             <Icon className="w-5 h-5" />
