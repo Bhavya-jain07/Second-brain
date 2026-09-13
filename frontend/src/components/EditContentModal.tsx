@@ -32,7 +32,7 @@ export function EditContentModal({ item, onClose, onSave }: EditContentModalProp
 
   return (
     <div className="fixed inset-0 bg-swiss-ink/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-white border-2 border-swiss-ink w-full max-w-sm p-6" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-swiss-card border-2 border-swiss-ink w-full max-w-sm p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-extrabold text-swiss-ink uppercase text-sm tracking-wide">Edit details</h2>
           <button onClick={onClose} className="text-swiss-faint hover:text-swiss-ink">
@@ -49,7 +49,7 @@ export function EditContentModal({ item, onClose, onSave }: EditContentModalProp
             type="button"
             onClick={() => setPinned((p) => !p)}
             className={`w-full flex items-center gap-2 text-sm font-bold uppercase tracking-wide px-3 py-2.5 border-2 transition ${
-              pinned ? "bg-swiss-ink border-swiss-ink text-white" : "border-swiss-ink text-swiss-ink hover:bg-swiss-panel"
+              pinned ? "bg-swiss-ink border-swiss-ink text-swiss-bg" : "border-swiss-ink text-swiss-ink hover:bg-swiss-panel"
             }`}
           >
             <PinIcon filled={pinned} className="w-4 h-4" />
@@ -82,7 +82,7 @@ export function EditContentModal({ item, onClose, onSave }: EditContentModalProp
           <button
             type="submit"
             disabled={saving}
-            className="w-full bg-swiss-ink text-white text-xs font-bold uppercase tracking-wide py-3 hover:bg-swiss-accent disabled:opacity-50 transition"
+            className="w-full bg-swiss-ink text-swiss-bg text-xs font-bold uppercase tracking-wide py-3 hover:bg-swiss-accent disabled:opacity-50 transition"
           >
             {saving ? "Saving…" : "Save"}
           </button>

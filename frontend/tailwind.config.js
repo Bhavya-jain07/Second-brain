@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: "class",
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
@@ -17,15 +18,20 @@ export default {
           900: "#3f1a8c",
         },
         // Swiss / International Typographic Style tokens — used for the
-        // dashboard (bold grid, minimal color, no gradients/shadows).
+        // dashboard. Values come from CSS variables (see index.css) so a
+        // single `.dark` class toggle flips the whole palette without
+        // touching any component. The rgb(var(...) / <alpha-value>)
+        // pattern is required for Tailwind's opacity modifiers (e.g.
+        // `text-swiss-bg/40`) to work with CSS-variable-based colors.
         swiss: {
-          bg: "#f5f4f0",
-          ink: "#111111",
-          accent: "#e8391c",
-          muted: "#6b6a66",
-          faint: "#a19f96",
-          line: "#d8d6ce",
-          panel: "#f0efe9",
+          bg: "rgb(var(--swiss-bg) / <alpha-value>)",
+          ink: "rgb(var(--swiss-ink) / <alpha-value>)",
+          accent: "rgb(var(--swiss-accent) / <alpha-value>)",
+          muted: "rgb(var(--swiss-muted) / <alpha-value>)",
+          faint: "rgb(var(--swiss-faint) / <alpha-value>)",
+          line: "rgb(var(--swiss-line) / <alpha-value>)",
+          panel: "rgb(var(--swiss-panel) / <alpha-value>)",
+          card: "rgb(var(--swiss-card) / <alpha-value>)",
         },
       },
       fontFamily: {

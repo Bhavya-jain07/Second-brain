@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import rateLimit from "express-rate-limit";
 import multer from "multer";
 import { ContentModel, LinkModel, UserModel, CONTENT_TYPES } from "./db";
+import { embedText, cosineSimilarity } from "./embeddings";
 import { JWT_SECRET, PORT, CLIENT_URL } from "./config";
 import { userMiddleware } from "./middleware";
 import { random } from "./utils";
@@ -195,6 +196,17 @@ app.post("/api/v1/content", userMiddleware, async (req, res) => {
     userId: req.userId,
   });
 
+  // Best-effort: generate a local embedding for semantic search. If this
+  // fails for any reason (model still loading, etc.), the content is
+  // already saved — it just won't show up in semantic search results.
+  try {
+    const embedding = await embedText(title);
+    content.set("embedding", embedding);
+    await content.save();
+  } catch (e) {
+    console.error("Embedding error (non-fatal):", e);
+  }
+
   res.status(201).json({ message: "Content added", content });
 });
 
@@ -232,6 +244,14 @@ app.post("/api/v1/content/upload", userMiddleware, (req, res) => {
         userId: req.userId,
       });
 
+      try {
+        const embedding = await embedText(req.file.originalname);
+        content.set("embedding", embedding);
+        await content.save();
+      } catch (e) {
+        console.error("Embedding error (non-fatal):", e);
+      }
+
       res.status(201).json({ message: "File added", content });
     } catch (e) {
       console.error("File save error:", e);
@@ -243,6 +263,53 @@ app.post("/api/v1/content/upload", userMiddleware, (req, res) => {
 app.get("/api/v1/content", userMiddleware, async (req, res) => {
   const content = await ContentModel.find({ userId: req.userId }).sort({ pinned: -1, createdAt: -1 });
   res.json({ content });
+});
+
+const semanticSearchSchema = z.object({
+  query: z.string().min(1).max(200),
+});
+
+// Semantic search: embeds the query locally (same free model used when
+// content is saved) and ranks the user's items by cosine similarity.
+// Lighter rate limit than auth routes since each call costs real CPU time
+// on the server (running the embedding model), even though it costs $0.
+const searchLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "Too many searches. Please slow down a little." },
+});
+
+app.post("/api/v1/content/search", userMiddleware, searchLimiter, async (req, res) => {
+  const parsed = semanticSearchSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ message: parsed.error.issues[0].message });
+    return;
+  }
+
+  try {
+    const queryEmbedding = await embedText(parsed.data.query);
+
+    // +select("+embedding") because the field is excluded by default.
+    const items = await ContentModel.find({ userId: req.userId }).select("+embedding");
+
+    const ranked = items
+      .filter((item) => Array.isArray(item.get("embedding")) && item.get("embedding").length > 0)
+      .map((item) => ({
+        item,
+        score: cosineSimilarity(queryEmbedding, item.get("embedding") as number[]),
+      }))
+      .sort((a, b) => b.score - a.score)
+      .filter((r) => r.score > 0.2) // drop weak/irrelevant matches
+      .slice(0, 20)
+      .map((r) => ({ ...r.item.toJSON(), score: r.score }));
+
+    res.json({ content: ranked });
+  } catch (e) {
+    console.error("Semantic search error:", e);
+    res.status(500).json({ message: "Search is warming up — try again in a few seconds." });
+  }
 });
 
 // Optional edit — add tags/a note, or pin an item, any time after it was
@@ -270,6 +337,18 @@ app.patch("/api/v1/content/:contentId", userMiddleware, async (req, res) => {
   if (!content) {
     res.status(404).json({ message: "Content not found" });
     return;
+  }
+
+  // If a note was added/changed, re-embed using title+note together so
+  // semantic search can also match on whatever context the user added.
+  if (parsed.data.note !== undefined) {
+    try {
+      const embedding = await embedText(`${content.title}. ${parsed.data.note}`);
+      content.set("embedding", embedding);
+      await content.save();
+    } catch (e) {
+      console.error("Embedding error (non-fatal):", e);
+    }
   }
 
   res.json({ message: "Updated", content });

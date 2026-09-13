@@ -35,9 +35,18 @@ const ContentSchema = new Schema(
     tags: { type: [String], default: [] }, // optional, added later by the user
     note: { type: String }, // optional short note, added later by the user
     pinned: { type: Boolean, default: false },
+    embedding: { type: [Number], select: false }, // local sentence embedding, used for semantic search — excluded from normal queries to keep payloads small
     userId: { type: mongoose.Types.ObjectId, ref: "User", required: true, index: true },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      transform: (_doc, ret: any) => {
+        delete ret.embedding; // never send the raw vector to the client
+        return ret;
+      },
+    },
+  }
 );
 
 export const ContentModel = model("Content", ContentSchema);

@@ -13,7 +13,7 @@ import { SkeletonGrid } from "../components/SkeletonGrid";
 import { EmptyState } from "../components/EmptyState";
 import { EditContentModal } from "../components/EditContentModal";
 import { BulkAddModal } from "../components/BulkAddModal";
-import { SearchIcon, SortIcon } from "../components/Icons";
+import { SearchIcon, SortIcon, SparkleIcon } from "../components/Icons";
 import { useToast, friendlyError } from "../components/Toast";
 
 type SortOrder = "newest" | "oldest";
@@ -31,6 +31,9 @@ export function Dashboard() {
   const [sortOrder, setSortOrder] = useState<SortOrder>("newest");
   const [editingItem, setEditingItem] = useState<ContentItem | null>(null);
   const [bulkAddOpen, setBulkAddOpen] = useState(false);
+  const [smartMode, setSmartMode] = useState(false);
+  const [smartResults, setSmartResults] = useState<ContentItem[] | null>(null);
+  const [smartLoading, setSmartLoading] = useState(false);
 
   useEffect(() => {
     if (!token) return;
@@ -51,6 +54,30 @@ export function Dashboard() {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [editingItem, bulkAddOpen, shareOpen]);
+
+  // Debounced semantic search — only runs while "Smart" mode is on, and
+  // waits half a second after typing stops so we're not hitting the
+  // (locally-run, but not free of CPU cost) embedding model on every
+  // keystroke.
+  useEffect(() => {
+    if (!smartMode || !query.trim()) {
+      setSmartResults(null);
+      return;
+    }
+    const handle = setTimeout(async () => {
+      setSmartLoading(true);
+      try {
+        const res = await api.post("/content/search", { query: query.trim() });
+        setSmartResults(res.data.content);
+      } catch (err) {
+        showToast(friendlyError(err), "error");
+        setSmartResults([]);
+      } finally {
+        setSmartLoading(false);
+      }
+    }, 500);
+    return () => clearTimeout(handle);
+  }, [smartMode, query]);
 
   async function loadContent() {
     setLoading(true);
@@ -139,10 +166,16 @@ export function Dashboard() {
   }
 
   const filtered = useMemo(() => {
+    // Smart mode with an active query defers entirely to the semantic
+    // search results from the server (already ranked by relevance).
+    if (smartMode && query.trim() && smartResults) {
+      return filter === "all" ? smartResults : smartResults.filter((c) => c.type === filter);
+    }
+
     let list = filter === "all" ? content : content.filter((c) => c.type === filter);
 
     const q = query.trim().toLowerCase();
-    if (q) {
+    if (q && !smartMode) {
       list = list.filter(
         (c) =>
           c.title.toLowerCase().includes(q) ||
@@ -158,7 +191,7 @@ export function Dashboard() {
     });
 
     return list;
-  }, [content, filter, query, sortOrder]);
+  }, [content, filter, query, sortOrder, smartMode, smartResults]);
 
   const counts = useMemo(
     () => ({
@@ -189,34 +222,56 @@ export function Dashboard() {
           </div>
 
           {/* Search + sort bar */}
-          <div className="grid grid-cols-[1fr_auto] border-2 border-swiss-ink mb-6">
+          <div className="grid grid-cols-[1fr_auto_auto] border-2 border-swiss-ink mb-2">
             <div className="flex items-center gap-2.5 px-4 py-3 border-r-2 border-swiss-ink">
               <SearchIcon className="w-4 h-4 text-swiss-muted shrink-0" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search titles, links, or tags…"
+                placeholder={smartMode ? "Ask in plain words… e.g. 'that video about react'" : "Search titles, links, or tags…"}
                 className="flex-1 min-w-0 text-sm outline-none bg-transparent placeholder:text-swiss-faint"
               />
             </div>
             <button
+              onClick={() => setSmartMode((s) => !s)}
+              className={`flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-4 border-r-2 border-swiss-ink transition ${
+                smartMode ? "bg-swiss-ink text-swiss-bg" : "hover:bg-swiss-panel"
+              }`}
+              title="Toggle semantic (meaning-based) search"
+            >
+              <SparkleIcon className="w-3.5 h-3.5" />
+              Smart
+            </button>
+            <button
               onClick={() => setSortOrder((s) => (s === "newest" ? "oldest" : "newest"))}
-              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-5 hover:bg-swiss-ink hover:text-white transition shrink-0"
+              className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide px-5 hover:bg-swiss-ink hover:text-swiss-bg transition shrink-0"
               title="Toggle sort order"
             >
               <SortIcon className="w-3.5 h-3.5" />
               {sortOrder === "newest" ? "Newest" : "Oldest"}
             </button>
           </div>
+          {smartMode && (
+            <p className="text-xs text-swiss-muted mb-6">
+              {smartLoading
+                ? "Searching by meaning…"
+                : "Smart search matches by meaning, not just exact words — runs locally, free."}
+            </p>
+          )}
+          {!smartMode && <div className="mb-6" />}
 
           <DropZone onAddLink={handleAddLink} onUploadFile={handleUploadFile} onBulkAddClick={() => setBulkAddOpen(true)}>
             {loading ? (
               <SkeletonGrid />
+            ) : smartMode && smartLoading ? (
+              <SkeletonGrid count={3} />
             ) : filtered.length === 0 ? (
               <EmptyState
                 message={
                   content.length === 0
                     ? "Nothing here yet — drag a link or file in, paste a link above, or press / to jump right to it."
+                    : smartMode && query
+                    ? "No meaningfully similar results — try different words."
                     : query
                     ? "No matches for your search."
                     : "Nothing in this category yet."

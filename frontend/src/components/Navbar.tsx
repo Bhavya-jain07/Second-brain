@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { ShareIcon } from "./Icons";
+import { ThemeToggle } from "./ThemeToggle";
 
 interface NavbarProps {
   username?: string;
@@ -32,6 +33,7 @@ export function Navbar({ username, onShareClick }: NavbarProps) {
 
         <div className="flex items-center gap-5">
           {username && <span className="hidden sm:block text-sm">hi, {username}</span>}
+          <ThemeToggle />
           {onShareClick && (
             <button
               onClick={onShareClick}

@@ -21,7 +21,16 @@ Two deliberately different visual languages, split by purpose:
 - **Dashboard / shared-brain view** — a Swiss / International Typographic
   Style layout: bold black grid lines, one red accent color, numbered
   cards, no gradients or shadows, cards invert to black on hover. Colors
-  live in `frontend/tailwind.config.js` under the `swiss` token group.
+  live in `frontend/tailwind.config.js` under the `swiss` token group,
+  which reads from CSS variables in `frontend/src/index.css` — this is
+  what makes dark mode (below) a single class toggle instead of editing
+  every component.
+- **Dark mode** — a sun/moon toggle in the navbar flips the whole Swiss
+  palette (not the pixel-art auth pages, which are unaffected) by adding
+  a `.dark` class to `<html>`, which swaps the CSS variables. Preference
+  is saved to `localStorage` and re-applied before React even mounts (see
+  the inline script in `frontend/index.html`) so there's no flash of the
+  wrong theme on load.
 
 ## Features
 
@@ -47,6 +56,16 @@ Two deliberately different visual languages, split by purpose:
   external storage service needed)
 - Bulk add — paste several links at once (one per line)
 - Search also matches tags, not just title/link
+- **Smart search** — an optional semantic search mode (sparkle icon in the
+  search bar) that matches by meaning, not just exact words. Runs entirely
+  locally using `@xenova/transformers` (a free, open-source embedding
+  model) — no OpenAI key, no per-call cost, nothing sent to a third party.
+  Trade-off: slightly lower quality than a paid embeddings API, and the
+  model (~90MB) needs to load into memory on first use after each deploy,
+  so the very first smart search after a cold start takes a few seconds
+  longer. On Render's free tier (512MB RAM), keep an eye on memory usage —
+  if the service crashes under load, that's why; upgrading the instance
+  size fixes it.
 - Mobile view: sidebar becomes a bottom tab bar on small screens
 - Press `/` anywhere to jump to the quick-add input
 - "Share Brain" generates a public link — anyone with it sees a read-only

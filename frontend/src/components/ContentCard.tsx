@@ -54,7 +54,7 @@ export function ContentCard({ item, index, onDelete, onEdit, readOnly = false }:
   const indexLabel = typeof index === "number" ? String(index + 1).padStart(2, "0") : null;
 
   return (
-    <div className="group relative bg-white border-r-2 border-b-2 border-swiss-ink hover:bg-swiss-ink transition-colors">
+    <div className="group relative bg-swiss-card border-r-2 border-b-2 border-swiss-ink hover:bg-swiss-ink transition-colors">
       {item.pinned && (
         <span className="absolute top-2.5 left-2.5 z-10 bg-swiss-accent text-white text-[10px] font-extrabold px-1.5 py-0.5 tracking-wide">
           PINNED
@@ -63,7 +63,7 @@ export function ContentCard({ item, index, onDelete, onEdit, readOnly = false }:
 
       {/* Thumbnail area */}
       {item.type === "youtube" && videoId ? (
-        <a href={item.link} target="_blank" rel="noreferrer" className="block relative aspect-video bg-swiss-panel border-b-2 border-swiss-ink group-hover:border-white/20">
+        <a href={item.link} target="_blank" rel="noreferrer" className="block relative aspect-video bg-swiss-panel border-b-2 border-swiss-ink group-hover:border-swiss-bg/20">
           <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover" />
         </a>
       ) : item.type === "twitter" ? (
@@ -71,7 +71,7 @@ export function ContentCard({ item, index, onDelete, onEdit, readOnly = false }:
           href={item.link}
           target="_blank"
           rel="noreferrer"
-          className="flex items-center justify-center aspect-video bg-swiss-panel border-b-2 border-swiss-ink group-hover:border-white/20 group-hover:bg-[#1c1b18] text-swiss-ink group-hover:text-white transition-colors"
+          className="flex items-center justify-center aspect-video bg-swiss-panel border-b-2 border-swiss-ink group-hover:border-swiss-bg/20 group-hover:bg-swiss-ink text-swiss-ink group-hover:text-swiss-bg transition-colors"
         >
           <TwitterIcon className="w-8 h-8" />
         </a>
@@ -81,7 +81,7 @@ export function ContentCard({ item, index, onDelete, onEdit, readOnly = false }:
           target="_blank"
           rel="noreferrer"
           download={isPdf ? undefined : item.fileName}
-          className="flex items-center justify-center aspect-video bg-swiss-panel border-b-2 border-swiss-ink group-hover:border-white/20 group-hover:bg-[#1c1b18] text-swiss-ink group-hover:text-white transition-colors"
+          className="flex items-center justify-center aspect-video bg-swiss-panel border-b-2 border-swiss-ink group-hover:border-swiss-bg/20 group-hover:bg-swiss-ink text-swiss-ink group-hover:text-swiss-bg transition-colors"
         >
           {isPdf ? <PdfBadgeIcon className="w-9 h-9" /> : <FileIcon className="w-8 h-8" />}
         </a>
@@ -90,7 +90,7 @@ export function ContentCard({ item, index, onDelete, onEdit, readOnly = false }:
           href={item.link}
           target="_blank"
           rel="noreferrer"
-          className="flex items-center justify-center aspect-video bg-swiss-panel border-b-2 border-swiss-ink group-hover:border-white/20 group-hover:bg-[#1c1b18] text-swiss-ink group-hover:text-white transition-colors"
+          className="flex items-center justify-center aspect-video bg-swiss-panel border-b-2 border-swiss-ink group-hover:border-swiss-bg/20 group-hover:bg-swiss-ink text-swiss-ink group-hover:text-swiss-bg transition-colors"
         >
           <LinkIcon className="w-8 h-8" />
         </a>
@@ -101,7 +101,7 @@ export function ContentCard({ item, index, onDelete, onEdit, readOnly = false }:
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             {indexLabel && (
-              <p className="text-[10px] font-bold text-swiss-faint group-hover:text-white/40 mb-1 tracking-wide">
+              <p className="text-[10px] font-bold text-swiss-faint group-hover:text-swiss-bg/40 mb-1 tracking-wide">
                 {indexLabel} — {TYPE_LABEL[item.type]}
               </p>
             )}
@@ -110,12 +110,12 @@ export function ContentCard({ item, index, onDelete, onEdit, readOnly = false }:
               target="_blank"
               rel="noreferrer"
               download={item.type === "file" && !isPdf ? item.fileName : undefined}
-              className="block text-sm font-semibold text-swiss-ink group-hover:text-white truncate"
+              className="block text-sm font-semibold text-swiss-ink group-hover:text-swiss-bg truncate"
               title={item.title}
             >
               {item.title}
             </a>
-            <p className="text-xs text-swiss-muted group-hover:text-white/50 truncate mt-0.5 font-mono">
+            <p className="text-xs text-swiss-muted group-hover:text-swiss-bg/50 truncate mt-0.5 font-mono">
               {item.type === "file" ? formatFileSize(item.fileSize) : item.link}
             </p>
           </div>
@@ -125,7 +125,7 @@ export function ContentCard({ item, index, onDelete, onEdit, readOnly = false }:
               {item.type !== "file" && (
                 <button
                   onClick={copyLink}
-                  className="text-swiss-faint hover:text-swiss-accent group-hover:text-white/50 group-hover:hover:text-swiss-accent transition p-0.5"
+                  className="text-swiss-faint hover:text-swiss-accent group-hover:text-swiss-bg/50 group-hover:hover:text-swiss-accent transition p-0.5"
                   aria-label="Copy link"
                   title={copied ? "Copied!" : "Copy link"}
                 >
@@ -135,7 +135,7 @@ export function ContentCard({ item, index, onDelete, onEdit, readOnly = false }:
               {onEdit && (
                 <button
                   onClick={() => onEdit(item)}
-                  className="text-swiss-faint hover:text-swiss-accent group-hover:text-white/50 group-hover:hover:text-swiss-accent transition p-0.5"
+                  className="text-swiss-faint hover:text-swiss-accent group-hover:text-swiss-bg/50 group-hover:hover:text-swiss-accent transition p-0.5"
                   aria-label="Edit"
                   title="Add tags, note, or pin"
                 >
@@ -145,7 +145,7 @@ export function ContentCard({ item, index, onDelete, onEdit, readOnly = false }:
               {onDelete && (
                 <button
                   onClick={() => onDelete(item._id)}
-                  className="text-swiss-faint hover:text-swiss-accent group-hover:text-white/50 group-hover:hover:text-swiss-accent transition p-0.5"
+                  className="text-swiss-faint hover:text-swiss-accent group-hover:text-swiss-bg/50 group-hover:hover:text-swiss-accent transition p-0.5"
                   aria-label="Delete"
                 >
                   <TrashIcon />
@@ -155,14 +155,14 @@ export function ContentCard({ item, index, onDelete, onEdit, readOnly = false }:
           )}
         </div>
 
-        {item.note && <p className="text-xs text-swiss-muted group-hover:text-white/60 mt-2 line-clamp-2">{item.note}</p>}
+        {item.note && <p className="text-xs text-swiss-muted group-hover:text-swiss-bg/60 mt-2 line-clamp-2">{item.note}</p>}
 
         {item.tags && item.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-2.5">
             {item.tags.map((tag) => (
               <span
                 key={tag}
-                className="text-[10px] font-bold uppercase tracking-wide border border-swiss-ink group-hover:border-white/30 text-swiss-ink group-hover:text-white/70 px-1.5 py-0.5"
+                className="text-[10px] font-bold uppercase tracking-wide border border-swiss-ink group-hover:border-swiss-bg/30 text-swiss-ink group-hover:text-swiss-bg/70 px-1.5 py-0.5"
               >
                 {tag}
               </span>

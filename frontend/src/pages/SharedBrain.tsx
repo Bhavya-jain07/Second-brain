@@ -4,6 +4,7 @@ import axios from "axios";
 import { BACKEND_URL } from "../lib/api";
 import { ContentItem } from "../lib/types";
 import { ContentCard } from "../components/ContentCard";
+import { ThemeToggle } from "../components/ThemeToggle";
 
 export function SharedBrain() {
   const { shareLink } = useParams();
@@ -47,7 +48,10 @@ export function SharedBrain() {
         <span className="font-extrabold text-lg tracking-tight">
           {username}'s SECOND<span className="text-swiss-accent">.</span>BRAIN
         </span>
-        <span className="text-xs font-bold uppercase tracking-wide text-swiss-muted">Read-only</span>
+        <span className="text-xs font-bold uppercase tracking-wide text-swiss-muted flex items-center gap-3">
+          Read-only
+          <ThemeToggle />
+        </span>
       </header>
 
       <main className="max-w-5xl mx-auto px-6 md:px-10 py-8">

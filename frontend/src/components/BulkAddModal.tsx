@@ -29,7 +29,7 @@ export function BulkAddModal({ onClose, onAddMany }: BulkAddModalProps) {
 
   return (
     <div className="fixed inset-0 bg-swiss-ink/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-white border-2 border-swiss-ink w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-swiss-card border-2 border-swiss-ink w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-1">
           <h2 className="font-extrabold text-swiss-ink uppercase text-sm tracking-wide">Add multiple links</h2>
           <button onClick={onClose} className="text-swiss-faint hover:text-swiss-ink">
@@ -51,7 +51,7 @@ export function BulkAddModal({ onClose, onAddMany }: BulkAddModalProps) {
             <button
               type="submit"
               disabled={busy || urls.length === 0}
-              className="bg-swiss-ink text-white text-xs font-bold uppercase tracking-wide px-4 py-2.5 hover:bg-swiss-accent disabled:opacity-40 transition"
+              className="bg-swiss-ink text-swiss-bg text-xs font-bold uppercase tracking-wide px-4 py-2.5 hover:bg-swiss-accent disabled:opacity-40 transition"
             >
               {busy ? "Adding…" : `Add ${urls.length || ""}`}
             </button>

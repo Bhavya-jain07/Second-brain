@@ -7,6 +7,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet" />
+    <script>
+      // Applied before React mounts so there's no flash of the wrong theme.
+      (function () {
+        try {
+          var saved = localStorage.getItem("theme");
+          if (saved === "dark") document.documentElement.classList.add("dark");
+        } catch (e) {}
+      })();
+    </script>
     <title>Second Brain</title>
   </head>
   <body>

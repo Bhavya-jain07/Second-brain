@@ -49,7 +49,7 @@ export function ShareModal({ onClose }: ShareModalProps) {
   return (
     <div className="fixed inset-0 bg-swiss-ink/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div
-        className="bg-white border-2 border-swiss-ink w-full max-w-md p-6"
+        className="bg-swiss-card border-2 border-swiss-ink w-full max-w-md p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2 mb-1">
@@ -83,7 +83,7 @@ export function ShareModal({ onClose }: ShareModalProps) {
           <button
             onClick={generateLink}
             disabled={loading}
-            className="w-full bg-swiss-ink text-white text-xs font-bold uppercase tracking-wide py-3 hover:bg-swiss-accent disabled:opacity-50 transition"
+            className="w-full bg-swiss-ink text-swiss-bg text-xs font-bold uppercase tracking-wide py-3 hover:bg-swiss-accent disabled:opacity-50 transition"
           >
             {loading ? "Generating…" : "Generate share link"}
           </button>
