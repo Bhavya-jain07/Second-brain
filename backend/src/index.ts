@@ -301,7 +301,7 @@ app.post("/api/v1/content/search", userMiddleware, searchLimiter, async (req, re
         score: cosineSimilarity(queryEmbedding, item.get("embedding") as number[]),
       }))
       .sort((a, b) => b.score - a.score)
-      .filter((r) => r.score > 0.2) // drop weak/irrelevant matches
+      .filter((r) => r.score > 0.05) // drop weak/irrelevant matches
       .slice(0, 20)
       .map((r) => ({ ...r.item.toJSON(), score: r.score }));
 
